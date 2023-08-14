@@ -1,4 +1,5 @@
-![image](https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/f2137262-4ab4-41a9-99ea-e5dc9f6eb534)
+<img width="747" alt="image" src="https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/b1e8ee4e-eacb-4ddc-b78c-6cc9572b67ce">
+
 
 <img width="747" alt="image" src="https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/d51c4213-8286-467f-875e-dfb89e5dcd7a">
 
