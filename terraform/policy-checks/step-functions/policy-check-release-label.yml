@@ -1,0 +1,74 @@
+name: 'Policy Check: EMR Release Label'
+
+on: [pull_request]
+
+defaults:
+  run:
+    shell: bash
+    
+env:
+  TARGET_RELEASE_LABEL: 6.10.0
+  
+permissions:
+  id-token: write
+  contents: read 
+  pull-requests: write
+  
+jobs:
+  pr_checks:
+    name: 'PR Checks'
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v29.0.7
+        with:
+          files: '**/*.tpl'
+
+      - name: Validate Policy
+        id: validate-policy 
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          {
+            echo "|Result |File |Reason |" 
+            echo "|--- |--- |--- |" 
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "result=pass" >> "$GITHUB_OUTPUT"
+          
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [ "${file: -4}" == ".tpl" ]; then
+              if ! grep -q emr-$TARGET_RELEASE_LABEL "$file"; then
+                echo "|👎 |$file | Not using EMR release label $TARGET_RELEASE_LABEL |" >> $GITHUB_STEP_SUMMARY
+                echo "result=fail" >> "$GITHUB_OUTPUT"
+              else
+                echo "|👍  |$file | Using EMR release label $TARGET_RELEASE_LABEL |" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Update your template to use \"ReleaseLabel\": \"emr-$TARGET_RELEASE_LABEL\"" >> $GITHUB_STEP_SUMMARY
+          
+          echo "summary<<EOF"  >> $GITHUB_ENV
+          cat $GITHUB_STEP_SUMMARY >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+      - name: Update Pull Request
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: process.env.summary
+            })
+      
+      - name: Result
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate-policy.outputs.result != 'pass'
+        run: exit 1
