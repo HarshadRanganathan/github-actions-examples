@@ -1,12 +1,16 @@
 name: 'Policy Check: Managed Scaling'
+
 on: [pull_request]
+
 defaults:
   run:
     shell: bash
+    
 permissions:
   id-token: write
   contents: read 
   pull-requests: write
+  
 jobs:
   pr_checks:
     name: 'PR Checks'
