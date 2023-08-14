@@ -4,4 +4,5 @@
 <img width="747" alt="image" src="https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/d51c4213-8286-467f-875e-dfb89e5dcd7a">
 
 
-![image](https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/0bd015c7-ee23-404d-baf2-d98ba00e4ecf)
+<img width="747" alt="image" src="https://github.com/HarshadRanganathan/github-actions-examples/assets/32612787/4f8a9b31-7b5f-4652-a642-d23f87e8e448">
+
