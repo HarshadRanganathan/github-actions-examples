@@ -1,19 +1,12 @@
 name: 'Policy Check: Managed Scaling'
-
-on:
-  pull_request:
-    paths:
-      - '**.tpl'
-
+on: [pull_request]
 defaults:
   run:
     shell: bash
-
 permissions:
   id-token: write
   contents: read 
   pull-requests: write
-
 jobs:
   pr_checks:
     name: 'PR Checks'
@@ -21,13 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Get Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v29.0.7
+        with:
+          files: '**/*.tpl'
 
       - name: Validate Policy
         id: validate-policy 
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           {
             echo "|Result |File |Reason |" 
@@ -54,6 +50,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           
       - name: Update Pull Request
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -66,6 +63,5 @@ jobs:
             })
       
       - name: Result
-        if: steps.validate-policy.outputs.result != 'pass'
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate-policy.outputs.result != 'pass'
         run: exit 1
-      
