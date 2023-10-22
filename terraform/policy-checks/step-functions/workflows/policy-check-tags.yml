@@ -1,0 +1,29 @@
+name: 'Policy Check: Tags'
+
+on: [pull_request]
+
+defaults:
+  run:
+    shell: bash
+    
+permissions:
+  id-token: write
+  contents: read 
+  pull-requests: write
+
+env:
+  APPNAMES: ("Google" "Microsoft)
+  ENVIRONMENTS: ("alpha" "stage" "prod")
+
+jobs:
+  pr_checks:
+    name: 'PR Checks'
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: ./.github/workflows/composite/tpl
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: policy-check-tags.sh
